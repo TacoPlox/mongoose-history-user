@@ -1,10 +1,8 @@
 # Mongoose History Plugin
 
-#[![Build Status](https://travis-ci.org/nassor/mongoose-history.svg?branch=master)](https://travis-ci.org/nassor/mongoose-history)
-
 Keeps a history of all changes of a document (And the user who made those).
 
-THIS IS A FORK FROM [mongoose-history](https://www.npmjs.com/package/mongoose-history-user)
+THIS IS A FORK FROM [mongoose-history-user](https://www.npmjs.com/package/mongoose-history-user)
 
 ## Installation
 
@@ -16,7 +14,7 @@ For starting history of your collection, you need to simply add the mongoose-his
 
 ```javascript
 var mongoose        = require('mongoose')
-  , mongooseHistory = require('mongoose-history')
+  , mongooseHistory = require('./path-to-your-folder/mongoose-history-v2')
   , Schema          = mongoose.Schema
 
 var Post = new Schema({
