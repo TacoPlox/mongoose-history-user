@@ -1,18 +1,14 @@
 # Mongoose History Plugin
 
-[![Build Status](https://travis-ci.org/nassor/mongoose-history.svg?branch=master)](https://travis-ci.org/nassor/mongoose-history)
+#[![Build Status](https://travis-ci.org/nassor/mongoose-history.svg?branch=master)](https://travis-ci.org/nassor/mongoose-history)
 
 Keeps a history of all changes of a document (And the user who made those).
 
-THIS IS A FORK FROM [mongoose-history](https://www.npmjs.com/package/mongoose-history)
+THIS IS A FORK FROM [mongoose-history](https://www.npmjs.com/package/mongoose-history-user)
 
 ## Installation
 
-```bash
-npm install mongoose-history-user
-```
-
-Or add it to your package.json
+Currently not available as an npm module. Please install it as a local npm package.
 
 ## Usage
 
@@ -40,14 +36,23 @@ var options = {customCollectionName: "post_hst"}
 Post.plugin(mongooseHistory, options)
 ```
 
+if you want to include the collection name in the history, you can use the option `includeCollectionName` as any truthy value. This will add an additional `col` value to you history documents.
+
+```javascript
+var options = {includeCollectionName: true}
+Post.plugin(mongooseHistory, options)
+```
+
 The history documents have the format:
 
 ```javascript
 {
     _id:  ObjectId,
-    t: Date // when history was made
-    o: "i" (insert) | "u" (update) | "r" (remove) // what happens with document
-    d: {  // changed document data
+    date: Date // when history was made
+    op: Operation type; "i" for insert, "u" for update, and "r" when removed.
+    doc: Original document
+    col: Collection name. Only if the option `includeCollectionName` is truthy!
+    diff: {  // changed document data; for example:
         _id:         ObjectId
       , title:       String
       , message:     String
@@ -60,7 +65,7 @@ The history documents have the format:
 To improve queries perfomance in history collection you can define indexes, for example:
 
 ```javascript
-var options = {indexes: [{'t': -1, 'd._id': 1}]};
+var options = {indexes: [{'date': -1, 'doc._id': 1}]};
 Post.plugin(mongooseHistory, options)
 ```
 
@@ -76,7 +81,7 @@ Post.plugin(mongooseHistory, options)
 ```
 
 ### Store metadata
-If you need to store aditionnal data, use the ```metadata``` option
+If you need to store additional data, use the ```metadata``` option
 It accepts a collection of objects. The parameters ```key``` and ```value``` are required. 
 You can specify mongoose options using the parameter ```schema``` (defaults to ```{type: mongoose.Schema.Types.Mixed}```)
 ```value``` can be either a String (resolved from the updated object), or a function, sync or async
@@ -118,7 +123,12 @@ Set the type of the 'modifiedBy' field and the contextPath setted before (You ca
 var options = {
     modifiedBy: {
         schemaType: mongoose.Schema.Types.ObjectId, // Can be String, ObjectId, etc.
-        contextPath: 'request:userInfo'
+        contextPath: 'request:userInfo',
+        blacklist: [ //Optionally blacklist fields from being saved; field is optional
+            'password',
+            'personalInfo',
+            'hugeField'
+        ]
     }
 };
 
